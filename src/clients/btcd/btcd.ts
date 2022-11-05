@@ -19,8 +19,9 @@ class BtcdClient {
   tryConnect() {
     try {
       this._connect();
-    } catch (error) {
-      console.log('Error', error);
+      return 'Success';
+    } catch (error: any) {
+      return error.message;
     }
   }
 
@@ -40,6 +41,7 @@ class BtcdClient {
       ca: [cert],
       cert
     });
+
     this.websocket.on('open', this._onOpen.bind(this));
     this.websocket.on('close', this._onClose.bind(this));
     this.websocket.on('error', () => this._onError);
@@ -60,11 +62,11 @@ class BtcdClient {
   }
 
   _onOpen() {
-    console.log('Websocket open');
+    console.log('Websocket opend');
   }
 
   _onClose() {
-    console.log('Websocket close');
+    console.log('Websocket closed');
   }
 
   _onError(error: Error) {
