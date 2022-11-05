@@ -30,7 +30,7 @@ class BtcdClient {
     const cert =
       certificatePath && fs.readFileSync(`${os.homedir()}/.btcd/rpc.cert`); // fs.readFileSync('./src/certs/rpc.cert');
 
-    // this._disconnect();
+    this._disconnect();
 
     this.websocket = new WebSocket(uri, {
       headers: {
@@ -63,7 +63,7 @@ class BtcdClient {
   }
 
   _onOpen() {
-    console.log('Websocket opend');
+    console.log('Websocket opened');
   }
 
   _onClose() {
