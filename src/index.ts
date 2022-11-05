@@ -1,17 +1,14 @@
-import config from './config';
-import BtcdClient from './clients/btcd';
+import express from 'express';
+// import config from './config';
+// import BtcdClient from './clients/btcd';
 
-class Nodana {
-  btcd;
+const app = express();
+const port = 3000;
 
-  constructor() {
-    this.btcd = new BtcdClient(config.btcd);
-  }
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
 
-  connect() {
-    this.btcd.tryConnect();
-  }
-}
-
-const nodana = new Nodana();
-nodana.connect();
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
