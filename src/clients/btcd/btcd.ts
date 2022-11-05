@@ -30,7 +30,7 @@ class BtcdClient {
     const cert =
       certificatePath && fs.readFileSync(`${os.homedir()}/.btcd/rpc.cert`); // fs.readFileSync('./src/certs/rpc.cert');
 
-    this._disconnect();
+    // this._disconnect();
 
     this.websocket = new WebSocket(uri, {
       headers: {
@@ -46,7 +46,7 @@ class BtcdClient {
     this.websocket.on('open', this._onOpen.bind(this));
     this.websocket.on('close', this._onClose.bind(this));
     this.websocket.on('error', this._onError.bind(this));
-    this.websocket.on('message', this._onMessage.bind(this));
+    // this.websocket.on('message', this._onMessage.bind(this));
   }
 
   _disconnect() {
@@ -74,10 +74,10 @@ class BtcdClient {
     console.log('Websocket error', error.message);
   }
 
-  _onMessage(message: any) {
-    const data = JSON.parse(message);
-    console.log(data);
-  }
+  // _onMessage(message: any) {
+  //   const data = JSON.parse(message);
+  //   console.log(data);
+  // }
 }
 
 export default BtcdClient;
