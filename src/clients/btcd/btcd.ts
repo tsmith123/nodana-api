@@ -1,3 +1,4 @@
+import os from 'os';
 import fs from 'fs';
 import WebSocket from 'ws';
 
@@ -27,7 +28,9 @@ class BtcdClient {
 
   _connect() {
     const { uri, username, password, certificatePath } = this.config;
-    const cert = certificatePath && fs.readFileSync(certificatePath);
+    const dir = `${os.homedir()}/.btcd/rpc.cert`;
+    console.log(dir);
+    const cert = certificatePath && fs.readFileSync(dir);
 
     this._disconnect();
 
