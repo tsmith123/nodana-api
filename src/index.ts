@@ -7,9 +7,9 @@ const port = 3000;
 
 app.get('/', (req, res) => {
   const client = new BtcdClient(config.btcd);
-  const result = client.tryConnect();
+  client.tryConnect();
 
-  res.send(result);
+  res.send('OK');
 });
 
 app.listen(port, () => {

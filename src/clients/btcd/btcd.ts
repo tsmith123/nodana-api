@@ -20,17 +20,15 @@ class BtcdClient {
   tryConnect() {
     try {
       this._connect();
-      return 'Success';
     } catch (error: any) {
-      return error.message;
+      console.log('Error', error);
     }
   }
 
   _connect() {
     const { uri, username, password, certificatePath } = this.config;
-    const dir = `${os.homedir()}/.btcd/rpc.cert`;
-    console.log(dir);
-    const cert = certificatePath && fs.readFileSync(dir);
+    const cert =
+      certificatePath && fs.readFileSync(`${os.homedir()}/.btcd/rpc.cert`); // fs.readFileSync('./src/certs/rpc.cert');
 
     this._disconnect();
 
@@ -38,7 +36,7 @@ class BtcdClient {
       headers: {
         // eslint-disable-next-line prefer-template
         Authorization:
-          'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+          'Basic ' + Buffer.from(`${username}:${password}`).toString('base64')
       },
       rejectUnauthorized: false,
       ca: [cert],
@@ -47,8 +45,8 @@ class BtcdClient {
 
     this.websocket.on('open', this._onOpen.bind(this));
     this.websocket.on('close', this._onClose.bind(this));
-    this.websocket.on('error', () => this._onError);
-    // this.websocket.on('message', this._onMessage.bind(this));
+    this.websocket.on('error', this._onError.bind(this));
+    this.websocket.on('message', this._onMessage.bind(this));
   }
 
   _disconnect() {
@@ -74,6 +72,11 @@ class BtcdClient {
 
   _onError(error: Error) {
     console.log('Websocket error', error.message);
+  }
+
+  _onMessage(message: any) {
+    const data = JSON.parse(message);
+    console.log(data);
   }
 }
 
