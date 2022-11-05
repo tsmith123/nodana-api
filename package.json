@@ -4,7 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "dev": "nodemon ./src/index.ts",
+    "start": "yarn build && node ./dist/cjs/index.js",
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
