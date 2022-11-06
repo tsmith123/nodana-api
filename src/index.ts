@@ -12,6 +12,6 @@ app.get('/', (req, res) => {
   res.send('OK');
 });
 
-app.listen(port, () => {
+app.listen(port, 'localhost', () => {
   console.log(`Nodana listening on port ${port}`);
 });
