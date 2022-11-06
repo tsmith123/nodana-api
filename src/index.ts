@@ -12,6 +12,10 @@ app.get('/', (req, res) => {
   res.send('OK');
 });
 
+app.get('/test', (req, res) => {
+  res.send('/test route');
+});
+
 app.listen(port, 'localhost', () => {
   console.log(`Nodana listening on port ${port}`);
 });
