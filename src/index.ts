@@ -1,21 +1,7 @@
-import express from 'express';
-import config from './config';
-import BtcdClient from './clients/btcd';
+// Entry point
+import envs from './helpers/envs';
+import app from './app';
 
-const app = express();
-const port = 3000;
-
-app.get('/', (req, res) => {
-  const client = new BtcdClient(config.btcd);
-  client.tryConnect();
-
-  res.send('OK');
-});
-
-app.get('/test', (req, res) => {
-  res.send('/test route');
-});
-
-app.listen(port, 'localhost', () => {
-  console.log(`Nodana listening on port ${port}`);
+app.listen(envs.PORT as number, 'localhost', () => {
+  console.log(`Nodana API listening on port ${envs.PORT}`);
 });

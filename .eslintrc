@@ -9,6 +9,7 @@
   ],
   "rules": {
     "semi": 2,
-    "eol-last": 2
+    "eol-last": 2,
+    "@typescript-eslint/no-explicit-any": 0
   }
 }
