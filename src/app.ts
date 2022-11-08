@@ -1,17 +1,10 @@
-import express from 'express';
+import envs from './helpers/envs'; // Trigger dotenv first
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
-import logger from 'morgan';
-import { developmentErrors, productionErrors } from './helpers/errors';
-import apiRoutes from './routes';
+import logger from './logger';
+import routes from './routes';
 
 const app = express();
-
-// Configure middleware
-if (process.env.NODE_ENV !== 'production') {
-  app.use(logger('dev'));
-} else {
-  app.use(logger('common'));
-}
 
 // Configure bodyParser
 app.use(
@@ -27,19 +20,12 @@ app.use(
 );
 
 // Routes
-app.use('/v1', apiRoutes); // Userfy API
+app.use('/v1', routes);
 
-// Handle 404
-app.use((req, res, next) => {
-  res.status(404).send({ message: 'Page could not be found' });
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.status(404).send({ message: 'Route not be found' });
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  /* Development Error Handler - Prints stack trace */
-  app.use(developmentErrors);
-}
-
-// production error handler
-app.use(productionErrors);
-
-export default app;
+app.listen(envs.PORT as number, 'localhost', () => {
+  logger.info(`Nodana API is listening ${envs.PORT}`, { scope: 'Api' });
+});

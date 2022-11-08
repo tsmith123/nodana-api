@@ -1,8 +1,17 @@
-// const App = require('@models/app');
+import { Context } from '../../types';
 
-const call = async (call: string, data: any) => {
-  console.log('Handler', call, data);
-  return [];
-};
+async function getRawTransaction(context: Context, txid: string) {
+  const transaction = await context.btcd.getRawTransaction(txid);
+  console.log('Transaction', transaction);
 
-export { call };
+  return transaction;
+}
+
+async function getBlockCount(context: Context) {
+  const count = await context.btcd.getBlockCount();
+  console.log('Count', count);
+
+  return count;
+}
+
+export { getRawTransaction, getBlockCount };
