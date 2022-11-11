@@ -12,6 +12,11 @@ const RECONNECT_INTERVAL = 1000;
 const ERROR_CODE_NORMAL_CLOSE = 1000;
 // const ERROR_CODE_NO_INFORMATION_AVAILABLE = -5;
 
+const URI = 'wss://127.0.0.1:18334/ws';
+
+const BTCD_USERNAME = process.env.BTCD_USERNAME;
+const BTCD_PASSWORD = process.env.BTCD_PASSWORD;
+
 interface TransactionWithTime extends types.Transaction {
   time: number;
 }
@@ -43,16 +48,18 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _connect() {
-    const { uri, username, password, certificatePath } = this.config;
-    const cert =
-      certificatePath && fs.readFileSync(`${os.homedir()}/.btcd/rpc.cert`); // fs.readFileSync('./src/certs/rpc.cert');
-
     this._disconnect();
 
-    this.websocket = new WebSocket(uri, {
+    const cert = fs.readFileSync(`${os.homedir()}/.btcd/rpc.cert`); // fs.readFileSync('./src/certs/rpc.cert');
+
+    console.log('Username', BTCD_USERNAME);
+    console.log('Password', BTCD_PASSWORD);
+
+    this.websocket = new WebSocket(URI, {
       headers: {
         Authorization:
-          'Basic ' + Buffer.from(`${username}:${password}`).toString('base64')
+          'Basic ' +
+          Buffer.from(`${BTCD_USERNAME}:${BTCD_PASSWORD}`).toString('base64')
       },
       rejectUnauthorized: false,
       ca: [cert],
