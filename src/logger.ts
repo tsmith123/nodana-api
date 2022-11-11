@@ -1,5 +1,5 @@
 import winston, { Logger } from 'winston';
-// import DailyRotateFile from 'winston-daily-rotate-file';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 const logger: Logger = winston.createLogger({
   level: 'info',
@@ -23,14 +23,14 @@ const logger: Logger = winston.createLogger({
             }`
         )
       )
+    }),
+    new DailyRotateFile({
+      dirname: '/var/log/nodana',
+      filename: 'nodana-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '7d'
     })
-    // new DailyRotateFile({
-    //   dirname: '/var/log/nodana',
-    //   filename: `${nodana}-%DATE%.log`,
-    //   datePattern: 'YYYY-MM-DD',
-    //   maxSize: '20m',
-    //   maxFiles: '7d'
-    // })
   ]
 });
 
