@@ -100,10 +100,7 @@ class BtcdClient implements types.BtcdClient {
 
     this.callCounter++;
 
-    console.log('Payload', payload);
-
     return new Promise((resolve, reject) => {
-      console.log('HIT 1', this.callbacks[callId]);
       this.callbacks[callId] = (error: string, result: T) => {
         if (error) {
           return reject(error);
@@ -112,7 +109,6 @@ class BtcdClient implements types.BtcdClient {
         resolve(result);
       };
 
-      console.log('HIT 2', this.websocket);
       this.websocket?.send(JSON.stringify(payload), (error) => {
         if (error) {
           reject(error);
@@ -209,10 +205,12 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _onOpen() {
+    console.log('Websocket opened');
     this.logger.info(`Connected to btcd at ${this.uri}`);
   }
 
   _onClose(code: number) {
+    console.log('Websocket closed');
     this.logger.error(`Disconnected from btcd (code: ${code})`);
 
     if (code === ERROR_CODE_NORMAL_CLOSE) {
@@ -226,10 +224,12 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _onError(error: any) {
+    console.log(`Websocket error ${error.message}`);
     this.logger.error(`Btcd error: ${error.message}`);
   }
 
   _onMessage(message: string) {
+    console.log(`Websocket message ${message}`);
     const data = JSON.parse(message);
     const callback = this.callbacks[data.id];
 
