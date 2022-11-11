@@ -70,7 +70,9 @@ class BtcdClient implements types.BtcdClient {
     this.websocket.on('open', () => this._onOpen);
     this.websocket.on('close', () => this._onClose);
     this.websocket.on('error', () => this._onError);
-    this.websocket.on('message', () => this._onMessage);
+    this.websocket.on('message', function message(data) {
+      console.log('received: %s', data);
+    });
   }
 
   _disconnect() {
@@ -118,7 +120,7 @@ class BtcdClient implements types.BtcdClient {
     });
   }
 
-  async getBlockCount() {
+  getBlockCount() {
     return this.call<number>('getblockcount');
   }
 
