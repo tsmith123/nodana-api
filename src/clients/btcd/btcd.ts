@@ -48,7 +48,7 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _connect() {
-    this.logger.info('Connecting websocket');
+    this.logger.info('Connecting websocket', BTCD_USERNAME);
     this._disconnect();
 
     const cert = fs.readFileSync(`${os.homedir()}/.btcd/rpc.cert`); // fs.readFileSync('./src/certs/rpc.cert');
@@ -102,6 +102,7 @@ class BtcdClient implements types.BtcdClient {
 
     return new Promise((resolve, reject) => {
       this.callbacks[callId] = (error: string, result: T) => {
+        console.log('Error', error);
         if (error) {
           return reject(error);
         }
@@ -109,28 +110,15 @@ class BtcdClient implements types.BtcdClient {
         resolve(result);
       };
 
-      console.log(payload);
-
-      // this.websocket?.send(JSON.stringify(payload), (error) => {
-      //   if (error) {
-      //     console.log('Websocket error', error);
-      //     reject(error);
-      //   }
-      // });
+      this.websocket?.send(JSON.stringify(payload), (error) => {
+        console.log('HIT', error);
+        if (error) {
+          console.log('Websocket error', error);
+          reject(error);
+        }
+      });
     });
   }
-
-  // getInfo() {
-  //   return this.call('getinfo');
-  // }
-
-  // sendRawTransaction(transaction) {
-  //   return this.call('sendrawtransaction', [transaction]);
-  // }
-
-  // decodeRawTransaction(rawTransaction) {
-  //   return this.call('decoderawtransaction', [rawTransaction]);
-  // }
 
   getRawTransaction(txid: string) {
     const verbose = 1;
@@ -153,55 +141,6 @@ class BtcdClient implements types.BtcdClient {
   getBlockCount() {
     return this.call<number>('getblockcount');
   }
-
-  // eslint-disable-next-line max-params
-  // searchRawTransactions(
-  //   address,
-  //   page,
-  //   pageSize = DEFAULT_PAGE_SIZE,
-  //   reverse = false
-  // ) {
-  //   const verbose = 1;
-  //   const skip = (page - 1) * pageSize;
-  //   const count = pageSize;
-  //   const vinextra = 1;
-
-  //   const params = [address, verbose, skip, count, vinextra, reverse];
-
-  //   return this.call('searchrawtransactions', params)
-  //     .then((transactions) => {
-  //       /**
-  //        * The searchrawtransactions API doesn't return a time for
-  //        * unconfirmed transactions. Ideally, it would be the time
-  //        * at which it was received by the node. This workaound
-  //        * sets it to the current time instead.
-  //        */
-  //       transactions.forEach((transaction) => {
-  //         transaction.time = transaction.time || new Date().getTime() / 1000;
-  //       });
-
-  //       return transactions;
-  //     })
-  //     .catch((error) => {
-  //       if (error.code === ERROR_CODE_NO_INFORMATION_AVAILABLE) {
-  //         /**
-  //          * No information available about address.
-  //          * Suppress error and return an empty array.
-  //          */
-  //         return [];
-  //       }
-
-  //       throw error;
-  //     });
-  // }
-
-  // estimateFee(numberOfBlocks) {
-  //   return this.call('estimatefee', [numberOfBlocks || 1]);
-  // }
-
-  // loadTxFilter(reload, addresses, outpoints) {
-  //   return this.call('loadtxfilter', [reload, addresses, outpoints]);
-  // }
 
   onRelevantTxAccepted(tx: string) {
     console.log('onRelevantTxAccepted', tx);
