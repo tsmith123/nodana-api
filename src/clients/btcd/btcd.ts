@@ -111,6 +111,7 @@ class BtcdClient implements types.BtcdClient {
 
       this.websocket?.send(JSON.stringify(payload), (error) => {
         if (error) {
+          console.log('Websocket error', error);
           reject(error);
         }
       });
