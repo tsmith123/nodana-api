@@ -7,8 +7,8 @@ async function getRawTransaction(context: Context, txid: string) {
   return transaction;
 }
 
-function getBlockCount(context: Context) {
-  const count = context.btcd.getBlockCount();
+async function getBlockCount(context: Context) {
+  const count = await context.btcd.getBlockCount();
   console.log('Count', count);
 
   return count;
