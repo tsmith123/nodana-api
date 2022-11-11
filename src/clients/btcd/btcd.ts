@@ -109,12 +109,14 @@ class BtcdClient implements types.BtcdClient {
         resolve(result);
       };
 
-      this.websocket?.send(JSON.stringify(payload), (error) => {
-        if (error) {
-          console.log('Websocket error', error);
-          reject(error);
-        }
-      });
+      console.log(payload);
+
+      // this.websocket?.send(JSON.stringify(payload), (error) => {
+      //   if (error) {
+      //     console.log('Websocket error', error);
+      //     reject(error);
+      //   }
+      // });
     });
   }
 
@@ -134,22 +136,18 @@ class BtcdClient implements types.BtcdClient {
     const verbose = 1;
     const params = [txid, verbose];
 
-    const test = this.call<TransactionWithTime>(
-      'getrawtransaction',
-      params
-    ).then((transaction) => {
-      /**
-       * The getrawtransaction API doesn't return a time for
-       * unconfirmed transactions. Ideally, it would be the time
-       * at which it was received by the node. This workaound
-       * sets it to the current time instead.
-       */
-      transaction.time = transaction.time || new Date().getTime() / 1000;
-      return transaction;
-    });
-
-    console.log('Test', test);
-    return test;
+    return this.call<TransactionWithTime>('getrawtransaction', params).then(
+      (transaction) => {
+        /**
+         * The getrawtransaction API doesn't return a time for
+         * unconfirmed transactions. Ideally, it would be the time
+         * at which it was received by the node. This workaound
+         * sets it to the current time instead.
+         */
+        transaction.time = transaction.time || new Date().getTime() / 1000;
+        return transaction;
+      }
+    );
   }
 
   getBlockCount() {
