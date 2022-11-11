@@ -140,6 +140,7 @@ class BtcdClient implements types.BtcdClient {
 
   getBlockCount() {
     const promise = this.call<number>('getblockcount');
+    console.log('Promise', promise);
     return Promise.resolve(promise);
   }
 
