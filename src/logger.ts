@@ -34,4 +34,4 @@ const logger: Logger = winston.createLogger({
   ]
 });
 
-export default logger;
+export { logger, Logger as LoggerType };

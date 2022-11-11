@@ -1,7 +1,7 @@
 import envs from './helpers/envs'; // Trigger dotenv first
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
-import logger from './logger';
+import { logger } from './logger';
 import routes from './routes';
 
 const app = express();

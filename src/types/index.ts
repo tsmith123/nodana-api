@@ -1,10 +1,3 @@
-export interface BtcdConfig {
-  uri: string;
-  username: string;
-  password: string;
-  certificatePath: string;
-}
-
 interface CoinbaseTransaction {
   coinbase: string;
   sequence: number;
@@ -44,7 +37,7 @@ export interface Transaction {
 }
 
 export interface BtcdClient {
-  config: BtcdConfig;
+  uri: string;
   logger: any;
   getRawTransaction: (txid: string) => Promise<Transaction>;
   getBlockCount: () => Promise<number>;

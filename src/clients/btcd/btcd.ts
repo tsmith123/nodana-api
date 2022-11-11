@@ -1,7 +1,7 @@
 import os from 'os';
 import fs from 'fs';
 import WebSocket from 'ws';
-import logger from '../../logger';
+import { logger, LoggerType } from '../../logger';
 import { getCatchErrorMessage } from '../../utils/getCatchErrorMessage';
 import * as types from '../../types';
 
@@ -12,7 +12,7 @@ const RECONNECT_INTERVAL = 1000;
 const ERROR_CODE_NORMAL_CLOSE = 1000;
 // const ERROR_CODE_NO_INFORMATION_AVAILABLE = -5;
 
-const URI = 'wss://127.0.0.1:18334/ws';
+const DEFAULT_URI = 'wss://127.0.0.1:18334/ws';
 
 const BTCD_USERNAME = process.env.BTCD_USERNAME;
 const BTCD_PASSWORD = process.env.BTCD_PASSWORD;
@@ -24,16 +24,16 @@ interface TransactionWithTime extends types.Transaction {
 type Callback = (err: string, result: any) => void;
 
 class BtcdClient implements types.BtcdClient {
-  config: types.BtcdConfig;
-  logger;
+  uri: string;
+  logger: LoggerType;
   websocket?: WebSocket;
   callCounter: number;
   callbacks: {
     [key: number]: Callback;
   };
 
-  constructor(config: types.BtcdConfig) {
-    this.config = config;
+  constructor(uri?: string) {
+    this.uri = uri || DEFAULT_URI;
     this.logger = logger.child({ scope: 'BtcdClient' });
 
     this._tryConnect();
@@ -55,7 +55,7 @@ class BtcdClient implements types.BtcdClient {
     console.log('Username', BTCD_USERNAME);
     console.log('Password', BTCD_PASSWORD);
 
-    this.websocket = new WebSocket(URI, {
+    this.websocket = new WebSocket(this.uri, {
       headers: {
         Authorization:
           'Basic ' +
@@ -206,7 +206,7 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _onOpen() {
-    this.logger.info(`Connected to btcd at ${this.config.uri}`);
+    this.logger.info(`Connected to btcd at ${this.uri}`);
   }
 
   _onClose(code: number) {
