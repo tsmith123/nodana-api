@@ -67,12 +67,10 @@ class BtcdClient implements types.BtcdClient {
     this.callCounter = 0;
     this.callbacks = {};
 
-    this.websocket.on('open', () => this._onOpen);
-    this.websocket.on('close', () => this._onClose);
-    this.websocket.on('error', () => this._onError);
-    this.websocket.on('message', function message(data) {
-      console.log('received: %s', data);
-    });
+    this.websocket.on('open', this._onOpen.bind(this));
+    this.websocket.on('close', this._onClose.bind(this));
+    this.websocket.on('error', this._onError.bind(this));
+    this.websocket.on('message', this._onMessage.bind(this));
   }
 
   _disconnect() {
