@@ -12,7 +12,7 @@ async function getRawTransaction(this: Context, req: Request, res: Response) {
 async function getBlockCount(this: Context, req: Request, res: Response) {
   const result = await bitcoinHandler.getBlockCount(this);
 
-  res.status(200).send(result);
+  res.status(200).send({ count: result });
 }
 
 export { getRawTransaction, getBlockCount };
