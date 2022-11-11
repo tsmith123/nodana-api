@@ -139,7 +139,8 @@ class BtcdClient implements types.BtcdClient {
   }
 
   getBlockCount() {
-    return this.call<number>('getblockcount');
+    const promise = this.call<number>('getblockcount');
+    return Promise.resolve(promise);
   }
 
   onRelevantTxAccepted(tx: string) {
