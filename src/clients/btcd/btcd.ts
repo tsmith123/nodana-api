@@ -27,7 +27,7 @@ class BtcdClient implements types.BtcdClient {
   uri: string;
   logger: LoggerType;
   websocket?: WebSocket;
-  callCounter: number;
+  public callCounter: number;
   callbacks: {
     [key: number]: Callback;
   };
@@ -48,12 +48,10 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _connect() {
+    this.logger.info('Connecting websocket');
     this._disconnect();
 
     const cert = fs.readFileSync(`${os.homedir()}/.btcd/rpc.cert`); // fs.readFileSync('./src/certs/rpc.cert');
-
-    console.log('Username', BTCD_USERNAME);
-    console.log('Password', BTCD_PASSWORD);
 
     this.websocket = new WebSocket(this.uri, {
       headers: {
@@ -76,6 +74,7 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _disconnect() {
+    this.logger.info('Disconnecting websocket');
     const websocket = this.websocket;
 
     if (!websocket) {
@@ -89,7 +88,7 @@ class BtcdClient implements types.BtcdClient {
   }
 
   call<T>(method: string, params?: (string | number)[]): Promise<T> {
-    this.logger.info('Calling method', method);
+    this.logger.info(`Calling method ${method}`);
     const callId = this.callCounter;
 
     const payload = {
@@ -100,6 +99,8 @@ class BtcdClient implements types.BtcdClient {
     };
 
     this.callCounter++;
+
+    console.log('Payload', payload);
 
     return new Promise((resolve, reject) => {
       this.callbacks[callId] = (error: string, result: T) => {
