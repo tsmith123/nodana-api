@@ -8,8 +8,10 @@ async function getRawTransaction(context: Context, txid: string) {
 }
 
 function getBlockCount(context: Context) {
-  return context.btcd.getBlockCount().then((count) => {
-    return count;
+  return Promise.resolve().then(() => {
+    return context.btcd.getBlockCount().then((count) => {
+      return count;
+    });
   });
 
   // context.btcd.getBlockCount();
