@@ -103,6 +103,7 @@ class BtcdClient implements types.BtcdClient {
     console.log('Payload', payload);
 
     return new Promise((resolve, reject) => {
+      console.log('HIT 1', this.callbacks[callId]);
       this.callbacks[callId] = (error: string, result: T) => {
         if (error) {
           return reject(error);
@@ -111,6 +112,7 @@ class BtcdClient implements types.BtcdClient {
         resolve(result);
       };
 
+      console.log('HIT 2', this.websocket);
       this.websocket?.send(JSON.stringify(payload), (error) => {
         if (error) {
           reject(error);
