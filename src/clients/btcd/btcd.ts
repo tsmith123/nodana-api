@@ -102,7 +102,6 @@ class BtcdClient implements types.BtcdClient {
 
     return new Promise((resolve, reject) => {
       this.callbacks[callId] = (error: string, result: T) => {
-        console.log('Error', error);
         if (error) {
           return reject(error);
         }
@@ -111,13 +110,16 @@ class BtcdClient implements types.BtcdClient {
       };
 
       this.websocket?.send(JSON.stringify(payload), (error) => {
-        console.log('HIT', error);
         if (error) {
           console.log('Websocket error', error);
           reject(error);
         }
       });
     });
+  }
+
+  async getBlockCount() {
+    return this.call<number>('getblockcount');
   }
 
   getRawTransaction(txid: string) {
@@ -136,13 +138,6 @@ class BtcdClient implements types.BtcdClient {
         return transaction;
       }
     );
-  }
-
-  getBlockCount() {
-    const promise = this.call<number>('getblockcount');
-    return Promise.resolve(promise).then((count) => {
-      return count;
-    });
   }
 
   onRelevantTxAccepted(tx: string) {
