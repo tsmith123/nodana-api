@@ -10,7 +10,7 @@ const RECONNECT_INTERVAL = 1000;
 // const DEFAULT_PAGE_SIZE = 100;
 
 const ERROR_CODE_NORMAL_CLOSE = 1000;
-// const ERROR_CODE_NO_INFORMATION_AVAILABLE = -5;
+const ERROR_CODE_NO_INFORMATION_AVAILABLE = -5;
 
 const DEFAULT_URI = 'wss://127.0.0.1:18334/ws';
 
@@ -141,16 +141,14 @@ class BtcdClient implements types.BtcdClient {
   }
 
   onRelevantTxAccepted(tx: string) {
-    console.log('onRelevantTxAccepted', tx);
+    this.logger.info(`onRelevantTxAccepted ${tx}`);
   }
 
   _onOpen() {
-    console.log('Websocket opened');
     this.logger.info(`Connected to btcd at ${this.uri}`);
   }
 
   _onClose(code: number) {
-    console.log('Websocket closed');
     this.logger.error(`Disconnected from btcd (code: ${code})`);
 
     if (code === ERROR_CODE_NORMAL_CLOSE) {
@@ -164,14 +162,14 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _onError(error: any) {
-    console.log(`Websocket error ${error.message}`);
     this.logger.error(`Btcd error: ${error.message}`);
   }
 
   _onMessage(message: string) {
-    console.log(`Websocket message ${message}`);
     const data = JSON.parse(message);
     const callback = this.callbacks[data.id];
+
+    this.logger.error(`Websocket message: ${data}`);
 
     if (callback) {
       callback(data.error, data.result);

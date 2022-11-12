@@ -4,15 +4,15 @@ import { Context } from '../../types';
 
 async function getRawTransaction(this: Context, req: Request, res: Response) {
   const txid: string = req.params.txid;
-  const result = await bitcoinHandler.getRawTransaction(this, txid);
+  const data = await bitcoinHandler.getRawTransaction(this, txid);
 
-  res.status(200).send(result);
+  res.status(200).send({ data });
 }
 
 async function getBlockCount(this: Context, req: Request, res: Response) {
-  const result = await bitcoinHandler.getBlockCount(this);
+  const data = await bitcoinHandler.getBlockCount(this);
 
-  res.status(200).send({ count: result });
+  res.status(200).send({ data });
 }
 
 export { getRawTransaction, getBlockCount };
