@@ -1,11 +1,47 @@
 import { Context } from '../../types';
+// import { logger, LoggerType } from '../../logger';
+
+const ERROR_CODE_NO_INFORMATION_AVAILABLE = -5;
 
 async function getRawTransaction(context: Context, txid: string) {
-  return context.btcd.getRawTransaction(txid);
+  try {
+    return context.btcd.getRawTransaction(txid);
+  } catch (error: any) {
+    return {
+      error: 'GET_RAW_TRANSACTION',
+      message: 'Transaction could not be retrieved'
+    };
+  }
+}
+
+async function getAddressBalance(context: Context, address: string) {
+  try {
+    const transactions = await context.btcd.searchRawTransactions(address);
+    console.log(transactions);
+    // Will need to add some logic here to calculate balance
+    return 1;
+  } catch (error: any) {
+    // This means that the blockchain hasn't finished syncing yet
+    if (error.code === ERROR_CODE_NO_INFORMATION_AVAILABLE) {
+      return [];
+    }
+
+    return {
+      error: 'GET_ADDRESS_BALANCE',
+      message: 'Address balance could not be retrieved'
+    };
+  }
 }
 
 async function getBlockCount(context: Context) {
-  return context.btcd.getBlockCount();
+  try {
+    return context.btcd.getBlockCount();
+  } catch (error: any) {
+    return {
+      error: 'GET_BLOCK_COUNT',
+      message: 'Block count could not be retrieved'
+    };
+  }
 }
 
-export { getRawTransaction, getBlockCount };
+export { getRawTransaction, getAddressBalance, getBlockCount };

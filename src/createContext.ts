@@ -1,9 +1,9 @@
 import BtcdClient from './clients/btcd';
-import * as types from './types';
+import { Context } from './types';
 
 const createContext = () => {
-  const context: types.Context = {
-    btcd: new BtcdClient()
+  const context: Context = {
+    btcd: new BtcdClient(process.env.BTCD_WEBSOCKET_URI as string)
   };
 
   return context;

@@ -27,5 +27,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.listen(envs.PORT as number, 'localhost', () => {
-  logger.info(`Nodana API is listening ${envs.PORT}`, { scope: 'Api' });
+  logger.info(`Nodana API is listening on port ${process.env.PORT}`, {
+    scope: 'Api'
+  });
 });

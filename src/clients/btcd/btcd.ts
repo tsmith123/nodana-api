@@ -1,41 +1,34 @@
+// This client should be entirely independent of any utils and helpers
+// from the wider app.
 import os from 'os';
 import fs from 'fs';
 import WebSocket from 'ws';
-import { logger, LoggerType } from '../../logger';
-import { getCatchErrorMessage } from '../../utils/getCatchErrorMessage';
-import * as types from '../../types';
+import { BtcdClient, TransactionType } from './types';
 
 const JSON_RPC_VERSION = '1.0';
 const RECONNECT_INTERVAL = 1000;
-// const DEFAULT_PAGE_SIZE = 100;
-
+const DEFAULT_PAGE_SIZE = 100;
 const ERROR_CODE_NORMAL_CLOSE = 1000;
-const ERROR_CODE_NO_INFORMATION_AVAILABLE = -5;
-
-const DEFAULT_URI = 'wss://127.0.0.1:18334/ws';
-
 const BTCD_USERNAME = process.env.BTCD_USERNAME;
 const BTCD_PASSWORD = process.env.BTCD_PASSWORD;
-
-interface TransactionWithTime extends types.Transaction {
-  time: number;
-}
+const BTCD_CERT_PATH = process.env.BTCD_CERT_PATH;
 
 type Callback = (err: string, result: any) => void;
 
-class BtcdClient implements types.BtcdClient {
+class Btcd implements BtcdClient {
   uri: string;
-  logger: LoggerType;
   websocket?: WebSocket;
   callCounter: number;
   callbacks: {
     [key: number]: Callback;
   };
 
-  constructor(uri?: string) {
-    this.uri = uri || DEFAULT_URI;
-    this.logger = logger.child({ scope: 'BtcdClient' });
+  constructor(uri: string) {
+    if (!uri) {
+      console.log('Uri must be provided');
+    }
 
+    this.uri = uri;
     this._tryConnect();
   }
 
@@ -43,15 +36,15 @@ class BtcdClient implements types.BtcdClient {
     try {
       this._connect();
     } catch (error) {
-      this.logger.error(getCatchErrorMessage(error));
+      console.log(error);
     }
   }
 
   _connect() {
-    this.logger.info('Connecting websocket', BTCD_USERNAME);
     this._disconnect();
+    console.log('Connecting websocket');
 
-    const cert = fs.readFileSync(`${os.homedir()}/.btcd/rpc.cert`); // fs.readFileSync('./src/certs/rpc.cert');
+    const cert = fs.readFileSync(BTCD_CERT_PATH as string);
 
     this.websocket = new WebSocket(this.uri, {
       headers: {
@@ -74,7 +67,7 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _disconnect() {
-    this.logger.info('Disconnecting websocket');
+    console.log('Disconnecting websocket');
     const websocket = this.websocket;
 
     if (!websocket) {
@@ -87,8 +80,8 @@ class BtcdClient implements types.BtcdClient {
     delete this.websocket;
   }
 
-  call<T>(method: string, params?: (string | number)[]): Promise<T> {
-    this.logger.info(`Calling method ${method}`);
+  call<T>(method: string, params?: (string | number | boolean)[]): Promise<T> {
+    console.log(`Calling method ${method}`);
     const callId = this.callCounter;
 
     const payload = {
@@ -126,30 +119,48 @@ class BtcdClient implements types.BtcdClient {
     const verbose = 1;
     const params = [txid, verbose];
 
-    return this.call<TransactionWithTime>('getrawtransaction', params).then(
-      (transaction) => {
-        /**
-         * The getrawtransaction API doesn't return a time for
-         * unconfirmed transactions. Ideally, it would be the time
-         * at which it was received by the node. This workaound
-         * sets it to the current time instead.
-         */
-        transaction.time = transaction.time || new Date().getTime() / 1000;
-        return transaction;
-      }
-    );
+    return this.call<TransactionType>('getrawtransaction', params);
+  }
+
+  searchRawTransactions(address: string) {
+    const page = 1;
+    const pageSize = DEFAULT_PAGE_SIZE;
+    const reverse = false;
+
+    const verbose = 1;
+    const skip = (page - 1) * pageSize;
+    const count = pageSize;
+    const vinextra = 1;
+
+    const params = [address, verbose, skip, count, vinextra, reverse];
+
+    return this.call<TransactionType[]>('searchrawtransactions', params);
   }
 
   onRelevantTxAccepted(tx: string) {
-    this.logger.info(`onRelevantTxAccepted ${tx}`);
+    console.log(`onRelevantTxAccepted ${tx}`);
   }
 
   _onOpen() {
-    this.logger.info(`Connected to btcd at ${this.uri}`);
+    console.log(`Connected to btcd at ${this.uri}`);
+  }
+
+  _onMessage(message: string) {
+    const data = JSON.parse(message);
+    const callback = this.callbacks[data.id];
+
+    console.log(`Websocket message: ${message}`);
+
+    if (callback) {
+      callback(data.error, data.result);
+      delete this.callbacks[data.id];
+    } else if (data.method === 'relevanttxaccepted') {
+      this.onRelevantTxAccepted(data.params[0]);
+    }
   }
 
   _onClose(code: number) {
-    this.logger.error(`Disconnected from btcd (code: ${code})`);
+    console.log(`Disconnected from btcd (code: ${code})`);
 
     if (code === ERROR_CODE_NORMAL_CLOSE) {
       return;
@@ -162,22 +173,8 @@ class BtcdClient implements types.BtcdClient {
   }
 
   _onError(error: any) {
-    this.logger.error(`Btcd error: ${error.message}`);
-  }
-
-  _onMessage(message: string) {
-    const data = JSON.parse(message);
-    const callback = this.callbacks[data.id];
-
-    this.logger.error(`Websocket message: ${data}`);
-
-    if (callback) {
-      callback(data.error, data.result);
-      delete this.callbacks[data.id];
-    } else if (data.method === 'relevanttxaccepted') {
-      this.onRelevantTxAccepted(data.params[0]);
-    }
+    console.log(`Btcd error: ${error.message}`);
   }
 }
 
-export default BtcdClient;
+export default Btcd;

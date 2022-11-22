@@ -12,10 +12,13 @@ router.get('/ping', (req, res) => {
 /*
  * Bitcoin
  */
-// router.get('/bitcoin/transactions/:txid', catchErrors(bitcoin.getTransaction));
 router.get(
   '/bitcoin/transactions/:txid',
   wrapEndpoint(bitcoin.getRawTransaction)
+);
+router.get(
+  '/bitcoin/balance/:address',
+  wrapEndpoint(bitcoin.getAddressBalance)
 );
 router.get('/bitcoin/blocks/count', wrapEndpoint(bitcoin.getBlockCount));
 

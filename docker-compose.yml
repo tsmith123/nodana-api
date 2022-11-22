@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  # redis:
+  #   image: 'redis:alpine'
+  #   ports:
+  #     - '6379:6379'
+  btcd:
+    container_name: btcd
+    build: ../docker-btcd
+    volumes:
+      - btcd-data:/btcd
+      - rpc-data:/rpc
+  web1:
+    container_name: api
+    build: .
+    restart: on-failure
+    depends_on:
+      - btcd
+    volumes:
+      - btcd-data:/btcd
+      - rpc-data:/rpc
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - web1
+
+volumes:
+  btcd-data:
+    external: false
+    name: "btcd-data"
+  rpc-data:
+    external: false
+    name: "rpc-data"
