@@ -9,6 +9,19 @@ async function getRawTransaction(this: Context, req: Request, res: Response) {
   res.status(200).send(result);
 }
 
+async function getAddress(this: Context, req: Request, res: Response) {
+  res.status(200).send({});
+}
+
+// Should accept a settings for confirmed, unconfirmed, unspent
+async function getAddressTransactions(
+  this: Context,
+  req: Request,
+  res: Response
+) {
+  res.status(200).send({});
+}
+
 async function getAddressBalance(this: Context, req: Request, res: Response) {
   const address: string = req.params.address;
   const result = await bitcoinHandler.getAddressBalance(this, address);
@@ -16,10 +29,23 @@ async function getAddressBalance(this: Context, req: Request, res: Response) {
   res.status(200).send(result);
 }
 
-async function getBlockCount(this: Context, req: Request, res: Response) {
-  const result = await bitcoinHandler.getBlockCount(this);
+async function getBlock(this: Context, req: Request, res: Response) {
+  const result = await bitcoinHandler.getBlock(this);
 
   res.status(200).send(result);
 }
 
-export { getRawTransaction, getAddressBalance, getBlockCount };
+async function getBlockCount(this: Context, req: Request, res: Response) {
+  const result = await bitcoinHandler.getBlockCount(this);
+
+  res.status(200).send({ count: result });
+}
+
+export {
+  getRawTransaction,
+  getAddress,
+  getAddressTransactions,
+  getAddressBalance,
+  getBlock,
+  getBlockCount
+};

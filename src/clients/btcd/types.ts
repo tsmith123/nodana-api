@@ -40,5 +40,6 @@ export interface BtcdClient {
   uri: string;
   getRawTransaction: (txid: string) => Promise<TransactionType>;
   searchRawTransactions: (address: string) => Promise<TransactionType[]>;
+  getBlock: () => Promise<number>;
   getBlockCount: () => Promise<number>;
 }

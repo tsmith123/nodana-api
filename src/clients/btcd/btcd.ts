@@ -1,12 +1,9 @@
-// This client should be entirely independent of any utils and helpers
-// from the wider app.
-import os from 'os';
 import fs from 'fs';
 import WebSocket from 'ws';
 import { BtcdClient, TransactionType } from './types';
 
 const JSON_RPC_VERSION = '1.0';
-const RECONNECT_INTERVAL = 1000;
+const RECONNECT_INTERVAL = 5000;
 const DEFAULT_PAGE_SIZE = 100;
 const ERROR_CODE_NORMAL_CLOSE = 1000;
 const BTCD_USERNAME = process.env.BTCD_USERNAME;
@@ -17,17 +14,13 @@ type Callback = (err: string, result: any) => void;
 
 class Btcd implements BtcdClient {
   uri: string;
-  websocket?: WebSocket;
+  websocket?: WebSocket | null;
   callCounter: number;
   callbacks: {
     [key: number]: Callback;
   };
 
   constructor(uri: string) {
-    if (!uri) {
-      console.log('Uri must be provided');
-    }
-
     this.uri = uri;
     this._tryConnect();
   }
@@ -36,13 +29,13 @@ class Btcd implements BtcdClient {
     try {
       this._connect();
     } catch (error) {
-      console.log(error);
+      //
     }
   }
 
   _connect() {
     this._disconnect();
-    console.log('Connecting websocket');
+    console.log('Disconnecting websocket');
 
     const cert = fs.readFileSync(BTCD_CERT_PATH as string);
 
@@ -81,7 +74,10 @@ class Btcd implements BtcdClient {
   }
 
   call<T>(method: string, params?: (string | number | boolean)[]): Promise<T> {
-    console.log(`Calling method ${method}`);
+    if (!this.websocket) {
+      throw new Error('Websocket is not connected');
+    }
+
     const callId = this.callCounter;
 
     const payload = {
@@ -109,6 +105,10 @@ class Btcd implements BtcdClient {
         }
       });
     });
+  }
+
+  getBlock() {
+    return this.call<number>('getblock');
   }
 
   getBlockCount() {
@@ -161,6 +161,7 @@ class Btcd implements BtcdClient {
 
   _onClose(code: number) {
     console.log(`Disconnected from btcd (code: ${code})`);
+    this.websocket = null;
 
     if (code === ERROR_CODE_NORMAL_CLOSE) {
       return;

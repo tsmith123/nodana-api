@@ -1,0 +1,25 @@
+# Build image
+FROM node:alpine as build
+
+# RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+
+WORKDIR /usr/src/app
+
+COPY package*.json /usr/src/app/
+COPY . .
+
+RUN npm install && \
+    rm -f .npmrc && \
+    npm run build
+
+# Production Build
+FROM node:alpine
+
+USER node
+WORKDIR /usr/src/app
+
+COPY --chown=node:node --from=build /usr/src/app/node_modules /usr/src/app/node_modules
+COPY --chown=node:node --from=build /usr/src/app/dist /usr/src/app
+
+CMD ["node","index.js"]
+

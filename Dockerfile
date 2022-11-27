@@ -1,13 +1,11 @@
-FROM node:alpine
+FROM node:16-alpine
 
+# RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY package.json .
-COPY tsconfig.json .
-COPY .env .
-COPY src src
+COPY package*.json /usr/src/app/
+COPY . .
 
-RUN yarn
-RUN yarn build
+RUN npm install
 
-CMD ["node","dist/index.js"]
+CMD ["npm","run","dev"]

@@ -26,8 +26,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).send({ message: 'Route not be found' });
 });
 
-app.listen(envs.PORT as number, 'localhost', () => {
-  logger.info(`Nodana API is listening on port ${process.env.PORT}`, {
+app.listen(envs.PORT as number, () => {
+  logger.info(`Nodana API isa listening on port ${process.env.PORT}`, {
     scope: 'Api'
   });
 });
