@@ -34,7 +34,7 @@ class Btcd implements BtcdClient {
     try {
       this._connect();
     } catch (error) {
-      //
+      console.log('Error', error);
     }
   }
 

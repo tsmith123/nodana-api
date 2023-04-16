@@ -5,10 +5,6 @@ import routes from './routes';
 
 const app = express();
 
-console.log(process.env.BTCD_USERNAME);
-console.log(process.env.BTCD_PASSWORD);
-console.log(process.env.BTCD_CERT_PATH);
-
 // Configure bodyParser
 app.use(
   bodyParser.json({
