@@ -1,3 +1,4 @@
+import os from 'os';
 import fs from 'fs';
 import WebSocket from 'ws';
 import { BtcdClient, TransactionType } from './types';
@@ -42,7 +43,9 @@ class Btcd implements BtcdClient {
     this._disconnect();
     console.log('Connecting websocket');
 
-    const cert = fs.readFileSync(BTCD_CERT_PATH as string);
+    const dir = `${os.homedir()}/${BTCD_CERT_PATH}`;
+    console.log('Retrieving certificate from', dir);
+    const cert = fs.readFileSync(dir);
 
     this.websocket = new WebSocket(this.uri, {
       headers: {
