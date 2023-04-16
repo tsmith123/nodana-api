@@ -10,18 +10,23 @@ const BTCD_USERNAME = process.env.BTCD_USERNAME;
 const BTCD_PASSWORD = process.env.BTCD_PASSWORD;
 const BTCD_CERT_PATH = process.env.BTCD_CERT_PATH;
 
-type Callback = (err: string, result: any) => void;
+type Callback = (result: any) => void;
+type Options = {
+  debug?: boolean;
+};
 
 class Btcd implements BtcdClient {
   uri: string;
+  debug: boolean;
   websocket?: WebSocket | null;
   callCounter: number;
   callbacks: {
     [key: number]: Callback;
   };
 
-  constructor(uri: string) {
+  constructor(uri: string, options?: Options) {
     this.uri = uri;
+    this.debug = options?.debug || false;
     this._tryConnect();
   }
 
@@ -35,7 +40,7 @@ class Btcd implements BtcdClient {
 
   _connect() {
     this._disconnect();
-    console.log('Disconnecting websocket');
+    console.log('Connecting websocket');
 
     const cert = fs.readFileSync(BTCD_CERT_PATH as string);
 
@@ -74,6 +79,7 @@ class Btcd implements BtcdClient {
   }
 
   call<T>(method: string, params?: (string | number | boolean)[]): Promise<T> {
+    console.log('Calling', method);
     if (!this.websocket) {
       throw new Error('Websocket is not connected');
     }
@@ -90,11 +96,7 @@ class Btcd implements BtcdClient {
     this.callCounter++;
 
     return new Promise((resolve, reject) => {
-      this.callbacks[callId] = (error: string, result: T) => {
-        if (error) {
-          return reject(error);
-        }
-
+      this.callbacks[callId] = (result: T) => {
         resolve(result);
       };
 
@@ -152,7 +154,7 @@ class Btcd implements BtcdClient {
     console.log(`Websocket message: ${message}`);
 
     if (callback) {
-      callback(data.error, data.result);
+      callback(data);
       delete this.callbacks[data.id];
     } else if (data.method === 'relevanttxaccepted') {
       this.onRelevantTxAccepted(data.params[0]);

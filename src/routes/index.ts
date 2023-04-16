@@ -28,7 +28,7 @@ router.get(
 );
 
 /* Blocks */
-router.get('/bitcoin/blocks/:height', wrapEndpoint(bitcoin.getBlock));
-router.get('/bitcoin/blocks/count', wrapEndpoint(bitcoin.getBlockCount));
+router.get('/blocks/count', wrapEndpoint(bitcoin.getBlockCount));
+router.get('/blocks/:height', wrapEndpoint(bitcoin.getBlock));
 
 export default router;

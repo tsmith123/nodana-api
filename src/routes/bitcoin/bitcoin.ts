@@ -31,7 +31,6 @@ async function getAddressBalance(this: Context, req: Request, res: Response) {
 
 async function getBlock(this: Context, req: Request, res: Response) {
   const result = await bitcoinHandler.getBlock(this);
-
   res.status(200).send(result);
 }
 

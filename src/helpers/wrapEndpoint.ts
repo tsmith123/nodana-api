@@ -6,18 +6,25 @@ const context = createContext();
 
 const wrapEndpoint =
   (fn: any) => (req: Request, res: Response, next: NextFunction) => {
-    try {
-      return (
-        fn
-          .call(context, req, res)
-          // .then(() => next())
-          .catch((err: any) => {
-            handleError(err, req, res, next);
-          })
-      );
-    } catch (err: any) {
-      handleError(err, req, res, next);
-    }
+    Promise.resolve(fn.call(context, req, res)).catch((err) =>
+      handleError(err, req, res, next)
+    );
   };
+
+// const wrapEndpoint =
+//   (fn: any) => (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       return (
+//         fn
+//           .call(context, req, res)
+//           // .then(() => next())
+//           .catch((err: any) => {
+//             handleError(err, req, res, next);
+//           })
+//       );
+//     } catch (err: any) {
+//       handleError(err, req, res, next);
+//     }
+//   };
 
 export default wrapEndpoint;

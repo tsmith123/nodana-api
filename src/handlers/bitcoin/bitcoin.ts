@@ -1,4 +1,5 @@
 import { Context } from '../../types';
+import { BtcdResponse } from '../../clients/btcd/types';
 // import { logger, LoggerType } from '../../logger';
 
 const ERROR_CODE_NO_INFORMATION_AVAILABLE = -5;
@@ -17,8 +18,8 @@ async function getRawTransaction(context: Context, txid: string) {
 
 async function getAddressBalance(context: Context, address: string) {
   try {
-    const transactions = await context.btcd.searchRawTransactions(address);
-    console.log(transactions);
+    const response = await context.btcd.searchRawTransactions(address);
+    console.log(response);
     // Will need to add some logic here to calculate balance
     return {
       id: '12345',
@@ -41,25 +42,29 @@ async function getAddressBalance(context: Context, address: string) {
 }
 
 async function getBlock(context: Context) {
-  try {
-    return context.btcd.getBlock();
-  } catch (error: any) {
+  const response: BtcdResponse = await context.btcd.getBlock();
+
+  if (response.error) {
     return {
-      error: 'GET_BLOCK_COUNT',
-      message: 'Block count could not be retrieved'
+      error: 'GET_BLOCK',
+      message: 'Block could not be retrieved'
     };
   }
+
+  return response.result;
 }
 
 async function getBlockCount(context: Context) {
-  try {
-    return context.btcd.getBlockCount();
-  } catch (error: any) {
+  const response: BtcdResponse = await context.btcd.getBlockCount();
+
+  if (response.error) {
     return {
       error: 'GET_BLOCK_COUNT',
       message: 'Block count could not be retrieved'
     };
   }
+
+  return response.result;
 }
 
 export { getRawTransaction, getAddressBalance, getBlock, getBlockCount };

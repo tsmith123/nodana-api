@@ -23,11 +23,16 @@ app.use(
 app.use('/v1', routes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.status(404).send({ message: 'Route not be found' });
+  res.status(404).send({ message: 'Route not found' });
+});
+
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  console.log(error);
+  res.status(500).send({ message: error.message });
 });
 
 app.listen(envs.PORT as number, () => {
-  logger.info(`Nodana API isa listening on port ${process.env.PORT}`, {
+  logger.info(`Nodana API is listening on port ${process.env.PORT}`, {
     scope: 'Api'
   });
 });
