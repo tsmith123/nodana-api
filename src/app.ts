@@ -1,10 +1,13 @@
-import envs from './helpers/envs'; // Trigger dotenv first
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import { logger } from './logger';
 import routes from './routes';
 
 const app = express();
+
+console.log(process.env.BTCD_USERNAME);
+console.log(process.env.BTCD_PASSWORD);
+console.log(process.env.BTCD_CERT_PATH);
 
 // Configure bodyParser
 app.use(
@@ -31,7 +34,7 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send({ message: error.message });
 });
 
-app.listen(envs.PORT as number, () => {
+app.listen(process.env.PORT, () => {
   logger.info(`Nodana API is listening on port ${process.env.PORT}`, {
     scope: 'Api'
   });
